@@ -3,7 +3,7 @@ import Nav from "./components/Nav";
 
 function App() {
   return (
-    <section className="mx-auto lg:w-[1200px]">
+    <section className="mx-auto max-w-7xl">
       <Nav />
       <div className="mt-5 px-2">
         <Outlet />
