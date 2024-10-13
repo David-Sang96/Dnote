@@ -35,11 +35,11 @@ const NoteForm = ({ isCreate }: Props) => {
 
   const FormSchema = Yup.object({
     title: Yup.string()
-      .min(3, "Title is too short!")
-      .max(30, "Title is too long!")
+      .min(3, "Title is too short")
+      .max(30, "Title is too long")
       .required("Title is required"),
     content: Yup.string()
-      .min(10, "Content is too short!")
+      .min(10, "Content is too short")
       .required("Content is required"),
   });
 
@@ -64,7 +64,7 @@ const NoteForm = ({ isCreate }: Props) => {
         validateOnChange={true}
         validateOnBlur={true}
       >
-        {({ errors, touched }) => (
+        {({ errors }) => (
           <Form className="mt-5 space-y-4">
             <div>
               <label
