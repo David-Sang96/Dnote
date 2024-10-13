@@ -1,6 +1,12 @@
 import express from 'express';
 import { body } from 'express-validator';
-import { createNotes, getNotes } from '../controllers/note.controller';
+import {
+  createNote,
+  deleteNote,
+  getNotes,
+  getSingleNote,
+  updateNote,
+} from '../controllers/note.controller';
 import { validationError } from '../ultis/validationError';
 
 const route = express.Router();
@@ -26,6 +32,12 @@ const validation = () => {
 
 route.get('/', getNotes);
 
-route.post('/create', validation(), validationError, createNotes);
+route.get('/:id', getSingleNote);
+
+route.post('/create', validation(), validationError, createNote);
+
+route.patch('/update/:id', validation(), validationError, updateNote);
+
+route.delete('/:id', deleteNote);
 
 export default route;
