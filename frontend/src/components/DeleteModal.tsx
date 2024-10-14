@@ -1,8 +1,7 @@
 import { useState } from "react";
-import toast from "react-hot-toast";
 import { PiSpinnerBold } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
-import axiosInstance from "../ultis/axiosInstance";
+import serverRequestFn from "../ultis/serverRequestFn";
 
 interface DeleteProps {
   setShowModal: (value: boolean) => void;
@@ -12,21 +11,16 @@ interface DeleteProps {
 const DeleteModal = ({ setShowModal, _id }: DeleteProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
+
   const onDelete = async () => {
-    try {
-      setIsLoading(true);
-      await axiosInstance.delete(`/notes/${_id}`);
-      toast.success("Deleted");
+    const responseStatus = await serverRequestFn({
+      setIsLoading,
+      path: `/notes/${_id}`,
+      method: "DELETE",
+    });
+
+    if (responseStatus === 200) {
       navigate("/");
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast.error(error.message);
-      } else {
-        toast.error("Unknown error occur");
-      }
-    } finally {
-      setShowModal(false);
-      setIsLoading(false);
     }
   };
 

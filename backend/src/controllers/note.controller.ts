@@ -28,7 +28,7 @@ export const getSingleNote = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     if (!mongoose.isValidObjectId(id)) {
-      res.status(500).json({ message: 'Invalid Id' });
+      res.status(400).json({ message: 'Invalid Id' });
       return;
     }
 
@@ -51,7 +51,7 @@ export const updateNote = async (req: Request, res: Response) => {
     const { title, content } = req.body;
 
     if (!mongoose.isValidObjectId(id)) {
-      res.status(500).json({ message: 'Invalid Id' });
+      res.status(400).json({ message: 'Invalid Id' });
       return;
     }
 
@@ -60,6 +60,11 @@ export const updateNote = async (req: Request, res: Response) => {
       { title, content },
       { new: true }
     );
+
+    if (!note) {
+      res.status(404).json({ message: 'Note not found' });
+      return;
+    }
 
     res.json({ message: 'Note updated', note });
   } catch (error) {
@@ -72,7 +77,7 @@ export const deleteNote = async (req: Request, res: Response) => {
   try {
     const id = req.params.id;
     if (!mongoose.isValidObjectId(id)) {
-      res.status(500).json({ message: 'Invalid Id' });
+      res.status(400).json({ message: 'Invalid Id' });
       return;
     }
 

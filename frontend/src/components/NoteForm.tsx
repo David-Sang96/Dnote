@@ -1,7 +1,10 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
+import { useEffect, useState } from "react";
 import { IoReturnUpBackOutline } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
+import { PiSpinnerBold } from "react-icons/pi";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
+import serverRequestFn from "../ultis/serverRequestFn";
 
 type Props = {
   isCreate: boolean;
@@ -12,12 +15,16 @@ interface FormValues {
   content: string;
 }
 
-const initialValues: FormValues = {
-  title: "",
-  content: "",
-};
-
 const NoteForm = ({ isCreate }: Props) => {
+  const { id } = useParams();
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isError, setIsError] = useState<string>("");
+  const [initialValues, setInitialValues] = useState<FormValues>({
+    title: "",
+    content: "",
+  });
+
   const navigate = useNavigate();
 
   // const validate = (values: FormValues) => {
@@ -33,6 +40,24 @@ const NoteForm = ({ isCreate }: Props) => {
   //   return errors;
   // };
 
+  useEffect(() => {
+    if (id) {
+      const getNote = async () => {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/notes/${id}`);
+        const data = await res.json();
+        if (data.message) {
+          setIsError(data.message);
+        }
+        setInitialValues({
+          title: data.title || "",
+          content: data.content || "",
+        });
+      };
+
+      getNote();
+    }
+  }, [id]);
+
   const FormSchema = Yup.object({
     title: Yup.string()
       .min(3, "Title is too short")
@@ -43,9 +68,40 @@ const NoteForm = ({ isCreate }: Props) => {
       .required("Content is required"),
   });
 
-  const handleSubmit = (values: FormValues) => {
-    console.log(values);
+  const handleSubmit = async (values: FormValues) => {
+    if (isCreate) {
+      const responseStatus = await serverRequestFn({
+        setIsLoading: setIsCreating,
+        path: "/notes/create",
+        method: "POST",
+        values,
+      });
+      if (responseStatus === 201) {
+        navigate("/");
+      }
+    } else {
+      const responseStatus = await serverRequestFn({
+        setIsLoading: setIsUpdating,
+        path: `/notes/update/${id}`,
+        method: "PATCH",
+        values,
+      });
+      if (responseStatus === 200) {
+        navigate("/");
+      }
+    }
   };
+
+  if (isError) {
+    return (
+      <div className="text-center text-xl font-medium text-red-500">
+        <p>{isError}</p>
+        <Link to={"/"} className="text-sm font-normal text-teal-500 underline">
+          Back to home
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto md:w-2/3">
@@ -61,8 +117,7 @@ const NoteForm = ({ isCreate }: Props) => {
         initialValues={initialValues}
         onSubmit={handleSubmit}
         validationSchema={FormSchema}
-        validateOnChange={true}
-        validateOnBlur={true}
+        enableReinitialize={true} // Allows form to update when initialValues change
       >
         {({ errors }) => (
           <Form className="mt-5 space-y-4">
@@ -77,7 +132,7 @@ const NoteForm = ({ isCreate }: Props) => {
                 type="text"
                 id="title"
                 name="title"
-                className={`mb-2 block w-full rounded-lg border bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 ${errors.title ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-teal-500"}`}
+                className={`mb-2 block w-full rounded-lg border bg-gray-50 p-2.5 text-sm text-gray-900 ${errors.title ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-teal-500 focus:border-teal-500 focus:ring-teal-500"}`}
                 placeholder="write your title here..."
               />
               {/* {errors.title && touched.title && (
@@ -103,8 +158,8 @@ const NoteForm = ({ isCreate }: Props) => {
                   id="content"
                   name="content"
                   as="textarea"
-                  rows={4}
-                  className={`mb-2 block w-full rounded-lg border bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-teal-500 focus:ring-teal-500 ${errors.content ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-teal-500"}`}
+                  rows={6}
+                  className={`mb-2 block w-full rounded-lg border bg-gray-50 p-2.5 text-sm text-gray-900 ${errors.content ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-teal-500 focus:border-teal-500 focus:ring-teal-500"}`}
                   placeholder="Write your content here..."
                 />
                 <ErrorMessage
@@ -117,8 +172,12 @@ const NoteForm = ({ isCreate }: Props) => {
             <div className="flex justify-end">
               <button
                 type="submit"
-                className="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300 sm:w-auto"
+                className={`flex w-full items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300 sm:w-auto ${(isUpdating || isCreating) && "cursor-not-allowed bg-teal-400 hover:bg-teal-500"}`}
+                disabled={isCreating || isUpdating}
               >
+                {(isCreating || isUpdating) && (
+                  <PiSpinnerBold size={17} className="animate-spin" />
+                )}
                 {isCreate ? " Save" : "Update"}
               </button>
             </div>
