@@ -38,7 +38,7 @@ export const getSingleNote = async (req: Request, res: Response) => {
       return;
     }
 
-    res.json({ note });
+    res.json(note);
   } catch (error) {
     console.error('Error in getSingleNote controller: ', error);
     res.status(500).json({ message: 'Something went wrong' });
