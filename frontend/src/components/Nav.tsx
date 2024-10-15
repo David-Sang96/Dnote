@@ -8,7 +8,7 @@ const Nav = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   return (
-    <nav className="flex items-center justify-between bg-slate-100 px-2 py-4">
+    <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-2 py-4">
       <Link to={"/"} className="text-2xl font-bold text-teal-600 md:text-3xl">
         Dnote.io
       </Link>

@@ -7,6 +7,7 @@ import {
   getSingleNote,
   updateNote,
 } from '../controllers/note.controller';
+import { multerUpload } from '../ultis/multer';
 import { validationError } from '../ultis/validationError';
 
 const route = express.Router();
@@ -34,9 +35,15 @@ route.get('/', getNotes);
 
 route.get('/:id', getSingleNote);
 
-route.post('/create', validation(), validationError, createNote);
+route.post('/create', multerUpload, validation(), validationError, createNote);
 
-route.patch('/update/:id', validation(), validationError, updateNote);
+route.patch(
+  '/update/:id',
+  multerUpload,
+  validation(),
+  validationError,
+  updateNote
+);
 
 route.delete('/:id', deleteNote);
 

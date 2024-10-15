@@ -9,7 +9,8 @@ export interface NoteType {
   _id: string;
   author: string;
   createdAt: string;
-  message?: string;
+  message: string;
+  image_url: string;
 }
 interface Notes {
   notes: NoteType[];

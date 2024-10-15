@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 import toast from "react-hot-toast";
 import axiosInstance from "./axiosInstance";
@@ -9,6 +10,7 @@ interface ServerRequestProps {
   values?: {
     title: string;
     content: string;
+    cover_image?: File | string;
   };
 }
 
@@ -20,7 +22,26 @@ const serverRequestFn = async ({
 }: ServerRequestProps) => {
   try {
     setIsLoading(true);
-    const response = await axiosInstance({ url: path, method, data: values });
+    let data: any = values;
+
+    if (values) {
+      const formData = new FormData();
+      formData.append("title", values.title);
+      formData.append("content", values.content);
+      if (values.cover_image && typeof values.cover_image !== "string") {
+        formData.append("cover_image", values.cover_image);
+      }
+      data = formData;
+    }
+
+    const response = await axiosInstance({
+      url: path,
+      method,
+      data,
+      headers: {
+        "Content-Type": values ? "multipart/form-data" : "application/json",
+      },
+    });
     toast.success(response.data.message);
     return response.status;
   } catch (error) {

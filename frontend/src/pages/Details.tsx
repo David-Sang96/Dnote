@@ -40,12 +40,17 @@ const Details = () => {
         <section className="mx-auto max-w-2xl">
           <div className="flex flex-col rounded-md border-t-4 border-teal-600 p-3 shadow-md">
             <div className="flex items-center justify-between pb-4">
-              <h2 className="font-medium md:text-lg">{data?.title}</h2>
+              <h2 className="text-lg font-medium">{data?.title}</h2>
               <button onClick={() => navigate(-1)}>
                 <IoReturnUpBackOutline className="size-6 text-teal-600 sm:size-8" />
               </button>
             </div>
-            <p className="text-sm">{data?.content}</p>
+            <p className="pb-3 text-sm">{data?.content}</p>
+            <img
+              src={data?.image_url}
+              alt="photo "
+              className="h-80 rounded-md"
+            />
             <div className="mt-auto flex items-center justify-between pt-4 text-xs text-gray-500">
               <div className="space-y-1 font-medium">
                 <div className="flex items-center gap-1">
