@@ -8,7 +8,7 @@ const Nav = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
   return (
-    <nav className="sticky top-0 flex items-center justify-between bg-slate-100 px-2 py-4">
+    <nav className="flex items-center justify-between bg-slate-100 px-2 py-4">
       <Link to={"/"} className="text-2xl font-bold text-teal-600 md:text-3xl">
         Dnote.io
       </Link>
@@ -45,7 +45,7 @@ const Nav = () => {
 
       {/* Sidebar menu for mobile device */}
       <div
-        className={`absolute bottom-0 right-0 top-0 overflow-hidden backdrop-blur-lg transition-all duration-500 ease-in-out ${showMenu ? "w-full" : "w-0"}`}
+        className={`fixed bottom-0 right-0 top-0 z-50 overflow-hidden backdrop-blur-lg transition-all duration-500 ease-in-out ${showMenu ? "w-full" : "w-0"}`}
       >
         <div className="flex flex-col text-gray-600">
           <div
@@ -58,7 +58,13 @@ const Nav = () => {
           <NavLink
             className="flex items-center gap-1 border py-2 pl-6"
             to={"/"}
-            onClick={() => setShowMenu(false)}
+            onClick={() => {
+              setShowMenu(false);
+              window.scrollTo({
+                top: 0,
+                behavior: "smooth",
+              });
+            }}
           >
             <IoHomeOutline className="size-5 text-teal-600" />
             HOME

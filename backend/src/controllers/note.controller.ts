@@ -7,9 +7,17 @@ import {
 } from '../ultis/UploadOnCloud';
 
 export const getNotes = async (req: Request, res: Response) => {
+  const currentPage = Number(req.query.page) || 1;
+  const perPageCount = 9;
+  const skip = (currentPage - 1) * perPageCount;
   try {
-    const notes = await Notes.find().sort({ createdAt: -1 });
-    res.json({ notes });
+    const notes = await Notes.find()
+      .skip(skip)
+      .limit(perPageCount)
+      .sort('-createdAt');
+    const totalNotes = await Notes.countDocuments();
+    const totalPages = Math.ceil(totalNotes / perPageCount);
+    res.json({ notes, totalNotes, totalPages });
   } catch (error) {
     console.error('Error in getNotes controller: ', error);
     res.status(500).json({ message: 'Something went wrong' });
