@@ -1,4 +1,5 @@
 # Logs
+
 logs
 *.log
 npm-debug.log*
@@ -20,5 +21,8 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
+
 *.sln
 *.sw?
+
+.env
