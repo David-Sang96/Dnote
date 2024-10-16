@@ -3,6 +3,9 @@ import App from "../App";
 import Create from "../pages/Create";
 import Details from "../pages/Details";
 import Home from "../pages/Home";
+
+import Login from "../pages/Login";
+import Register from "../pages/Register";
 import Update from "../pages/Update";
 
 const Router = () => {
@@ -27,6 +30,14 @@ const Router = () => {
         {
           path: "/note/:id",
           element: <Details />,
+        },
+        {
+          path: "/log-in",
+          element: <Login />,
+        },
+        {
+          path: "/register",
+          element: <Register />,
         },
       ],
     },

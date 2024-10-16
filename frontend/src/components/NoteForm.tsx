@@ -172,7 +172,7 @@ const NoteForm = ({ isCreate }: Props) => {
   }
 
   return (
-    <div className="mx-auto pb-5 md:w-2/3">
+    <div className="mx-auto max-w-2xl pb-5">
       <div className="item-center flex justify-between">
         <h2 className="text-lg font-semibold sm:text-xl">
           {isCreate ? "Create a new note." : "Update note"}

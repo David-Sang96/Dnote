@@ -21,7 +21,7 @@ const Nav = () => {
           <p>CREATE</p>
           <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
         </NavLink>
-        <NavLink to={"/about"} className="flex flex-col items-center gap-1">
+        <NavLink to={"/log-in"} className="flex flex-col items-center gap-1">
           <p>LOGIN</p>
           <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
         </NavLink>
@@ -71,7 +71,7 @@ const Nav = () => {
           </NavLink>
           <NavLink
             className="flex items-center gap-1 border py-2 pl-6"
-            to={"/collection"}
+            to={"/log-in"}
             onClick={() => setShowMenu(false)}
           >
             <IoMdLogIn className="size-5 text-teal-600" />
