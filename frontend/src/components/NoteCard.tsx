@@ -3,10 +3,17 @@ import { SlCalender } from "react-icons/sl";
 import { Link } from "react-router-dom";
 import type { NoteType } from "../pages/Home";
 
-const NoteCard = ({ title, content, _id, createdAt, image_url }: NoteType) => {
+const NoteCard = ({
+  title,
+  content,
+  _id,
+  createdAt,
+  image_url,
+  pathVar,
+}: NoteType) => {
   return (
     <Link
-      to={`/note/${_id}`}
+      to={`/${pathVar}/${_id}`}
       className="flex flex-col rounded-md border-t-4 border-teal-600 p-3 shadow-md"
     >
       <div className="flex justify-between">

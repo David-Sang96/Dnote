@@ -1,11 +1,11 @@
-import mongoose from 'mongoose';
+import mongoose, { ObjectId, Schema } from 'mongoose';
 
 interface INote {
   title: string;
   content: string;
   public_id: string;
   image_url: string;
-  author: string;
+  author: ObjectId;
 }
 
 const noteSchema = new mongoose.Schema<INote>(
@@ -14,7 +14,7 @@ const noteSchema = new mongoose.Schema<INote>(
     content: { type: String, required: true, minLength: 10 },
     public_id: { type: String, required: true },
     image_url: { type: String, required: true },
-    author: { type: String, default: 'Anonymous' },
+    author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   },
   { timestamps: true }
 );

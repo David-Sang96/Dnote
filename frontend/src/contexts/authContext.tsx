@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 
-interface UserType {
+export interface UserType {
   user: {
     name: string;
     email: string;
@@ -21,6 +21,7 @@ interface UserType {
 interface AuthContextType {
   authUser: UserType | null;
   setAuthUser: (val: UserType | null) => void;
+  loading: boolean;
 }
 
 interface Props {
@@ -31,12 +32,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthContextProvider = ({ children }: Props) => {
   const [authUser, setAuthUser] = useState<UserType | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("authUser");
     if (storedUser) {
       setAuthUser(JSON.parse(storedUser));
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -50,6 +53,7 @@ export const AuthContextProvider = ({ children }: Props) => {
   const contextValue: AuthContextType = {
     authUser,
     setAuthUser,
+    loading,
   };
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>

@@ -22,6 +22,24 @@ export const getNotes = async (req: Request, res: Response) => {
   }
 };
 
+export const getMyNotes = async (req: Request, res: Response) => {
+  const currentPage = Number(req.query.page) || 1;
+  const perPageCount = 9;
+  const skip = (currentPage - 1) * perPageCount;
+  try {
+    const notes = await Note.find({ author: req.userId })
+      .skip(skip)
+      .limit(perPageCount);
+
+    const totalNotes = await Note.find({ author: req.userId }).countDocuments();
+    const totalPages = Math.ceil(totalNotes / perPageCount);
+    res.json({ notes, totalNotes, totalPages });
+  } catch (error) {
+    console.error('Error in getMyNotes controller: ', error);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
 export const createNote = async (req: Request, res: Response) => {
   try {
     const { title, content } = req.body;
@@ -45,6 +63,7 @@ export const createNote = async (req: Request, res: Response) => {
       content,
       public_id,
       image_url,
+      author: req.userId,
     });
 
     res.status(201).json({ message: 'Note created', data: note });
@@ -95,6 +114,15 @@ export const updateNote = async (req: Request, res: Response) => {
       return;
     }
 
+    const isCurrentUser = note.author.toString() === req.userId;
+
+    if (!isCurrentUser) {
+      res
+        .status(403)
+        .json({ message: 'Not allowed to performance the action' });
+      return;
+    }
+
     if (note.public_id && req.file) {
       await deleteImageFromCloudinary(note.public_id);
 
@@ -127,6 +155,15 @@ export const deleteNote = async (req: Request, res: Response) => {
     const note = await Note.findById(req.params.id);
     if (!note) {
       res.status(404).json({ message: 'Note not found' });
+      return;
+    }
+
+    const isCurrentUser = note.author.toString() === req.userId;
+
+    if (!isCurrentUser) {
+      res
+        .status(403)
+        .json({ message: 'Not allowed to performance the action' });
       return;
     }
 

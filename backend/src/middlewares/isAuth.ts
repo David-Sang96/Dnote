@@ -14,7 +14,7 @@ declare global {
 const isAuth = (req: Request, res: Response, next: NextFunction) => {
   const authHeader = req.get('Authorization');
   if (!authHeader) {
-    res.status(401).json({ message: 'Unauthorized- no token provided' });
+    res.status(401).json({ message: 'Please log in to get access' });
     return;
   }
   const token = authHeader.split(' ')[1];
@@ -26,8 +26,15 @@ const isAuth = (req: Request, res: Response, next: NextFunction) => {
     }
     req.userId = (decoded as JwtPayload).userId;
     next();
-  } catch (error) {
-    console.log('Error in isAuth: ', error);
+  } catch (error: any) {
+    if (error.name === 'TokenExpiredError') {
+      res.status(401).json({ message: 'Unauthorized - token expired' });
+      return;
+    } else if (error.name === 'JsonWebTokenError') {
+      res.status(401).json({ message: 'Unauthorized - invalid token' });
+      return;
+    }
+    console.error('Error in isAuth:', error);
     res.status(500).json({ message: 'Something went wrong' });
   }
 };

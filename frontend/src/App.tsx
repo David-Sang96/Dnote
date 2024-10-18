@@ -1,14 +1,21 @@
 import { Toaster } from "react-hot-toast";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
+import { CSSTransition, SwitchTransition } from "react-transition-group";
 import Nav from "./components/Nav";
 
 function App() {
+  const location = useLocation();
+
   return (
     <section className="mx-auto max-w-6xl">
       <Nav />
-      <div className="mt-5 px-2">
-        <Outlet />
-      </div>
+      <SwitchTransition>
+        <CSSTransition timeout={200} classNames="fade" key={location.pathname}>
+          <div className="mt-5 px-2">
+            <Outlet />
+          </div>
+        </CSSTransition>
+      </SwitchTransition>
       <Toaster
         toastOptions={{
           // Define default options

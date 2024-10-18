@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { GrNotes } from "react-icons/gr";
 import { IoIosAddCircle, IoMdLogIn, IoMdLogOut } from "react-icons/io";
 import { IoHomeOutline, IoReturnUpBackOutline } from "react-icons/io5";
 import { RxHamburgerMenu } from "react-icons/rx";
@@ -21,10 +22,19 @@ const Nav = () => {
           <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
         </NavLink>
         {authUser && (
-          <NavLink to={"/create"} className="flex flex-col items-center gap-1">
-            <p>CREATE</p>
-            <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
-          </NavLink>
+          <>
+            <NavLink to={"/me"} className="flex flex-col items-center gap-1">
+              <p>MY NOTES</p>
+              <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
+            </NavLink>
+            <NavLink
+              to={"/create"}
+              className="flex flex-col items-center gap-1"
+            >
+              <p>CREATE</p>
+              <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
+            </NavLink>
+          </>
         )}
         {!authUser ? (
           <NavLink to={"/log-in"} className="flex flex-col items-center gap-1">
@@ -41,22 +51,23 @@ const Nav = () => {
             }}
           >
             <p>LOGOUT</p>
-            <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
           </button>
         )}
       </ul>
 
-      <div className="flex items-center gap-5 sm:hidden">
-        <Link to={"/create"}>
-          <IoIosAddCircle className="size-7 text-teal-600" />
-        </Link>
-        <div
-          className="text-3xl text-teal-600 sm:hidden"
-          onClick={() => setShowMenu((prev) => !prev)}
-        >
-          <RxHamburgerMenu />
+      {authUser && (
+        <div className="flex items-center gap-5 sm:hidden">
+          <Link to={"/create"}>
+            <IoIosAddCircle className="size-7 text-teal-600" />
+          </Link>
+          <div
+            className="text-3xl text-teal-600 sm:hidden"
+            onClick={() => setShowMenu((prev) => !prev)}
+          >
+            <RxHamburgerMenu />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Sidebar menu for mobile device */}
       <div
@@ -84,26 +95,39 @@ const Nav = () => {
             <IoHomeOutline className="size-5 text-teal-600" />
             HOME
           </NavLink>
-          <NavLink
-            className="flex items-center gap-1 border py-2 pl-6"
-            to={"/log-in"}
-            onClick={() => setShowMenu(false)}
-          >
-            <IoMdLogIn className="size-5 text-teal-600" />
-            LOGIN
-          </NavLink>
-          <button
-            className="flex items-center gap-1 border py-2 pl-6"
-            onClick={() => {
-              setAuthUser(null);
-              navigate("/log-in");
-              setShowMenu(false);
-              sessionStorage.removeItem("currentPage");
-            }}
-          >
-            <IoMdLogOut className="size-5 text-teal-600" />
-            LOGOUT
-          </button>
+          {authUser && (
+            <NavLink
+              to={"/me"}
+              className="flex items-center gap-1 border py-2 pl-6"
+              onClick={() => setShowMenu(false)}
+            >
+              <GrNotes className="size-5 text-teal-600" />
+              MY NOTES
+            </NavLink>
+          )}
+          {!authUser ? (
+            <NavLink
+              className="flex items-center gap-1 border py-2 pl-6"
+              to={"/log-in"}
+              onClick={() => setShowMenu(false)}
+            >
+              <IoMdLogIn className="size-5 text-teal-600" />
+              LOGIN
+            </NavLink>
+          ) : (
+            <button
+              className="flex items-center gap-1 border py-2 pl-6"
+              onClick={() => {
+                setAuthUser(null);
+                navigate("/log-in");
+                setShowMenu(false);
+                sessionStorage.removeItem("currentPage");
+              }}
+            >
+              <IoMdLogOut className="size-5 text-teal-600" />
+              LOGOUT
+            </button>
+          )}
         </div>
       </div>
     </nav>

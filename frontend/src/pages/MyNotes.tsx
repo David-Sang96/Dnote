@@ -5,6 +5,7 @@ import useSWR from "swr";
 import NoteCard from "../components/NoteCard";
 import ScrollToTopBtn from "../components/ScrollToTopBtn";
 import SkeletonNoteCard from "../components/SkeletonNoteCard";
+
 export interface NoteType {
   _id: string;
   author: string;
@@ -13,24 +14,45 @@ export interface NoteType {
   image_url: string;
   createdAt: string;
   message: string;
-  pathVar?: string;
 }
+
 export interface NotesResponse {
   notes: NoteType[];
   totalNotes: number;
   totalPages: number;
 }
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => {
+  const authUser = localStorage.getItem("authUser");
+  const token = authUser ? JSON.parse(authUser).token : null;
 
-const Home = () => {
+  return fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  }).then((res) => {
+    if (!res.ok) {
+      return res.json().then((errorData) => {
+        throw new Error(errorData.message || "Unauthorized - token expired");
+      });
+    }
+    return res.json();
+  });
+};
+
+const MyNotes = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
+  const [token, setToken] = useState<string | null>(null);
 
   const { data, isLoading, error } = useSWR<NotesResponse>(
-    `${import.meta.env.VITE_API_URL}/notes/all?page=${page}`,
+    token && `${import.meta.env.VITE_API_URL}/my-note?page=${page}`,
     fetcher,
   );
+
+  useEffect(() => {
+    const authUser = localStorage.getItem("authUser");
+    const fetchedToken = authUser ? JSON.parse(authUser).token : null;
+    setToken(fetchedToken);
+  }, []);
 
   useEffect(() => {
     const savedPage = sessionStorage.getItem("currentPage");
@@ -87,7 +109,7 @@ const Home = () => {
           <SkeletonNoteCard />
         ) : (
           data?.notes.map((note) => (
-            <NoteCard key={note._id} {...note} pathVar="note" />
+            <NoteCard key={note._id} {...note} pathVar="me" />
           ))
         )}
       </div>
@@ -138,4 +160,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default MyNotes;

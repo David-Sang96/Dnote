@@ -32,7 +32,7 @@ const validation = () => {
   ];
 };
 
-route.get('/', getNotes);
+route.get('/all', getNotes);
 
 route.get('/:id', getSingleNote);
 

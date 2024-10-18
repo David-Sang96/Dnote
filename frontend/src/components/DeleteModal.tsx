@@ -23,7 +23,7 @@ const DeleteModal = ({ setShowModal, _id }: DeleteProps) => {
     });
 
     if (responseStatus === 200) {
-      navigate("/");
+      navigate("/me");
     }
   };
 
