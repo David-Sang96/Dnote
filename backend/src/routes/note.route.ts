@@ -7,6 +7,7 @@ import {
   getSingleNote,
   updateNote,
 } from '../controllers/note.controller';
+import isAuth from '../middlewares/isAuth';
 import { multerUpload } from '../ultis/multer';
 import { validationError } from '../ultis/validationError';
 
@@ -35,16 +36,24 @@ route.get('/', getNotes);
 
 route.get('/:id', getSingleNote);
 
-route.post('/create', multerUpload, validation(), validationError, createNote);
+route.post(
+  '/create',
+  isAuth,
+  multerUpload,
+  validation(),
+  validationError,
+  createNote
+);
 
 route.patch(
   '/update/:id',
+  isAuth,
   multerUpload,
   validation(),
   validationError,
   updateNote
 );
 
-route.delete('/:id', deleteNote);
+route.delete('/:id', isAuth, deleteNote);
 
 export default route;

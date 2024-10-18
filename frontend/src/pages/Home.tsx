@@ -5,7 +5,6 @@ import useSWR from "swr";
 import NoteCard from "../components/NoteCard";
 import ScrollToTopBtn from "../components/ScrollToTopBtn";
 import SkeletonNoteCard from "../components/SkeletonNoteCard";
-
 export interface NoteType {
   _id: string;
   author: string;
@@ -32,6 +31,13 @@ const Home = () => {
     fetcher,
   );
 
+  useEffect(() => {
+    const savedPage = sessionStorage.getItem("currentPage");
+    if (savedPage) {
+      setPage(parseInt(savedPage, 10));
+    }
+  }, []);
+
   const handlePage = (selectedPage: number) => {
     if (
       selectedPage >= 1 &&
@@ -39,7 +45,8 @@ const Home = () => {
       selectedPage <= totalPage
     ) {
       setPage(selectedPage);
-      // Scroll to top when the page changes
+      sessionStorage.setItem("currentPage", selectedPage.toString());
+
       window.scrollTo({
         top: 0,
         behavior: "smooth",
@@ -82,43 +89,48 @@ const Home = () => {
         )}
       </div>
 
-      <nav
-        aria-label="Page navigation example"
-        className="mt-4 flex justify-end"
-      >
-        <ul className="flex h-8 items-center -space-x-px text-sm">
-          <li>
-            <button
-              className="ms-0 flex h-8 items-center justify-center rounded-s-lg border border-e-0 border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              onClick={() => handlePage(page - 1)}
-            >
-              <span className="sr-only">Previous</span>
-              <IoChevronBack />
-            </button>
-          </li>
-          {data &&
-            Array.from({ length: data.totalPages }).map((_, i) => (
-              <li key={i + 1}>
-                <button
-                  className={`flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white ${page === i + 1 ? "bg-stone-200" : ""}`}
-                  onClick={() => handlePage(i + 1)}
-                >
-                  {i + 1}
-                </button>
-              </li>
-            ))}
-          <li>
-            <button
-              className="flex h-8 items-center justify-center rounded-e-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-              onClick={() => handlePage(page + 1)}
-            >
-              <span className="sr-only">Next</span>
-              <IoChevronForward />
-            </button>
-          </li>
-        </ul>
-      </nav>
-      <ScrollToTopBtn />
+      {!isLoading && (
+        <nav
+          aria-label="Page navigation example"
+          className="mt-4 flex justify-end"
+        >
+          <ul className="flex h-8 items-center -space-x-px text-sm">
+            <li>
+              <button
+                className="ms-0 flex h-8 items-center justify-center rounded-s-lg border border-e-0 border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                onClick={() => handlePage(page - 1)}
+              >
+                <span className="sr-only">Previous</span>
+                <IoChevronBack />
+              </button>
+            </li>
+            {data &&
+              Array.from({ length: data.totalPages }).map((_, i) => (
+                <li key={i + 1}>
+                  <button
+                    className={`flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
+                    style={{ backgroundColor: page === i + 1 ? "#e7e5e4" : "" }} // Fallback to inline style
+                    onClick={() => handlePage(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                </li>
+              ))}
+            <li>
+              <button
+                className="flex h-8 items-center justify-center rounded-e-lg border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+                onClick={() => handlePage(page + 1)}
+              >
+                <span className="sr-only">Next</span>
+                <IoChevronForward />
+              </button>
+            </li>
+          </ul>
+        </nav>
+      )}
+      <div className="sm:hidden">
+        <ScrollToTopBtn />
+      </div>
     </section>
   );
 };

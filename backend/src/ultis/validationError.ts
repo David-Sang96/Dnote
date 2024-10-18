@@ -9,8 +9,7 @@ export const validationError = (
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     res.status(422).json({
-      message: 'Validation Failed',
-      errorMessage: errors.array(),
+      message: errors.array()[0].msg,
     });
     return;
   }

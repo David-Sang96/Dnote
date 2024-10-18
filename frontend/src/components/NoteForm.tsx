@@ -6,6 +6,7 @@ import { MdOutlineCloudUpload } from "react-icons/md";
 import { PiSpinnerBold } from "react-icons/pi";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import * as Yup from "yup";
+import { useAuthContext } from "../contexts/authContext";
 import serverRequestFn from "../ultis/serverRequestFn";
 
 type Props = {
@@ -23,13 +24,13 @@ const NoteForm = ({ isCreate }: Props) => {
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [isError, setIsError] = useState<string>("");
+  const [previewImg, setPreviewImg] = useState("");
   const [initialValues, setInitialValues] = useState<FormValues>({
     title: "",
     content: "",
     cover_image: "",
   });
-  const [previewImg, setPreviewImg] = useState("");
-
+  const { authUser } = useAuthContext();
   const navigate = useNavigate();
 
   // const validate = (values: FormValues) => {
@@ -121,6 +122,7 @@ const NoteForm = ({ isCreate }: Props) => {
         path: "/notes/create",
         method: "POST",
         values: updatedValues,
+        token: authUser?.token,
       });
       if (responseStatus === 201) {
         navigate("/");
@@ -131,6 +133,7 @@ const NoteForm = ({ isCreate }: Props) => {
         path: `/notes/update/${id}`,
         method: "PATCH",
         values: updatedValues,
+        token: authUser?.token,
       });
       if (responseStatus === 200) {
         navigate("/");

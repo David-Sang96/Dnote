@@ -4,6 +4,7 @@ import express, { type Request, type Response } from 'express';
 import morgan from 'morgan';
 import path from 'path';
 
+import authRoutes from './routes/auth.route';
 import noteRoutes from './routes/note.route';
 import connectDB from './ultis/db';
 
@@ -19,6 +20,7 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 app.use('/api/v1/notes', noteRoutes);
+app.use('/api/v1/auth', authRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../../frontend/dist')));

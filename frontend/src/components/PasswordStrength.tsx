@@ -12,11 +12,11 @@ interface Indicator {
 }
 
 interface Validity {
-  minLength: boolean | null;
-  minLowerCase: boolean | null;
-  minUpperCase: boolean | null;
-  minNumbers: boolean | null;
-  minSpecSymbols: boolean | null;
+  minLength: boolean;
+  minLowerCase: boolean;
+  minUpperCase: boolean;
+  minNumbers: boolean;
+  minSpecSymbols: boolean;
 }
 
 const PasswordStrengthIndicatorItems = ({ isValid, text }: Indicator) => {
@@ -37,7 +37,7 @@ const PasswordStrength = ({ password }: Props) => {
   const lowerCase = /^(?=.*?[a-z])/; // at least one lowercase
   const upperCase = /^(?=.*?[A-Z])/; // at least one uppercase
   const specialCharacter = /(?=.*?[!@#$%^&*()])/; // at least one special character
-  const length = /.{10,}$/; // at least 10 character long
+  const length = /.{8,}$/; // at least 8 character long
   const integer = /(?=.*\d)/; // at least one digit
 
   useEffect(() => {
@@ -105,7 +105,7 @@ const PasswordStrength = ({ password }: Props) => {
       <ul>
         <PasswordStrengthIndicatorItems
           isValid={passwordValidity?.minLength ?? false}
-          text={"At least 10 characters"}
+          text={"At least 8 characters"}
         />
         <PasswordStrengthIndicatorItems
           isValid={passwordValidity?.minLowerCase ?? false}

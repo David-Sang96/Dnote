@@ -1,6 +1,14 @@
 import mongoose from 'mongoose';
 
-const noteSchema = new mongoose.Schema(
+interface INote {
+  title: string;
+  content: string;
+  public_id: string;
+  image_url: string;
+  author: string;
+}
+
+const noteSchema = new mongoose.Schema<INote>(
   {
     title: { type: String, required: true, minLength: 3, maxLength: 30 },
     content: { type: String, required: true, minLength: 10 },
@@ -11,6 +19,13 @@ const noteSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Notes = mongoose.model('Notes', noteSchema);
+// Typing the query middleware with mongoose.Query
+noteSchema.pre(/^find/, function (this: mongoose.Query<INote, INote>, next) {
+  this.select('-__v');
+  this.sort('-createdAt');
+  next();
+});
 
-export default Notes;
+const Note = mongoose.model<INote>('Note', noteSchema);
+
+export default Note;

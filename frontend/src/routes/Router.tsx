@@ -1,14 +1,21 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import App from "../App";
 import Create from "../pages/Create";
 import Details from "../pages/Details";
 import Home from "../pages/Home";
 
+import { useAuthContext } from "../contexts/authContext";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import Update from "../pages/Update";
 
 const Router = () => {
+  const { authUser } = useAuthContext();
+
   const router = createBrowserRouter([
     {
       path: "/",
@@ -18,14 +25,21 @@ const Router = () => {
           index: true,
           element: <Home />,
         },
-
         {
           path: "/create",
-          element: <Create />,
+          element: authUser ? (
+            <Create />
+          ) : (
+            <Navigate to={"/log-in"} replace={true} />
+          ),
         },
         {
           path: "/update/:id",
-          element: <Update />,
+          element: authUser ? (
+            <Update />
+          ) : (
+            <Navigate to={"/log-in"} replace={true} />
+          ),
         },
         {
           path: "/note/:id",
@@ -33,11 +47,15 @@ const Router = () => {
         },
         {
           path: "/log-in",
-          element: <Login />,
+          element: !authUser ? <Login /> : <Navigate to={"/"} replace={true} />,
         },
         {
           path: "/register",
-          element: <Register />,
+          element: !authUser ? (
+            <Register />
+          ) : (
+            <Navigate to={"/"} replace={true} />
+          ),
         },
       ],
     },

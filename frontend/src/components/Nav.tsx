@@ -2,10 +2,13 @@ import { useState } from "react";
 import { IoIosAddCircle, IoMdLogIn, IoMdLogOut } from "react-icons/io";
 import { IoHomeOutline, IoReturnUpBackOutline } from "react-icons/io5";
 import { RxHamburgerMenu } from "react-icons/rx";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { useAuthContext } from "../contexts/authContext";
 
 const Nav = () => {
   const [showMenu, setShowMenu] = useState<boolean>(false);
+  const { authUser, setAuthUser } = useAuthContext();
+  const navigate = useNavigate();
 
   return (
     <nav className="flex items-center justify-between bg-slate-100 px-2 py-4">
@@ -17,18 +20,30 @@ const Nav = () => {
           <p>HOME</p>
           <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
         </NavLink>
-        <NavLink to={"/create"} className="flex flex-col items-center gap-1">
-          <p>CREATE</p>
-          <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
-        </NavLink>
-        <NavLink to={"/log-in"} className="flex flex-col items-center gap-1">
-          <p>LOGIN</p>
-          <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
-        </NavLink>
-        <NavLink to={"/contact"} className="flex flex-col items-center gap-1">
-          <p>LOGOUT</p>
-          <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
-        </NavLink>
+        {authUser && (
+          <NavLink to={"/create"} className="flex flex-col items-center gap-1">
+            <p>CREATE</p>
+            <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
+          </NavLink>
+        )}
+        {!authUser ? (
+          <NavLink to={"/log-in"} className="flex flex-col items-center gap-1">
+            <p>LOGIN</p>
+            <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
+          </NavLink>
+        ) : (
+          <button
+            className="flex flex-col items-center gap-1"
+            onClick={() => {
+              setAuthUser(null);
+              navigate("/log-in");
+              sessionStorage.removeItem("currentPage");
+            }}
+          >
+            <p>LOGOUT</p>
+            <hr className="hidden h-[1.5px] w-2/4 border-none bg-teal-700" />
+          </button>
+        )}
       </ul>
 
       <div className="flex items-center gap-5 sm:hidden">
@@ -77,14 +92,18 @@ const Nav = () => {
             <IoMdLogIn className="size-5 text-teal-600" />
             LOGIN
           </NavLink>
-          <NavLink
+          <button
             className="flex items-center gap-1 border py-2 pl-6"
-            to={"/about"}
-            onClick={() => setShowMenu(false)}
+            onClick={() => {
+              setAuthUser(null);
+              navigate("/log-in");
+              setShowMenu(false);
+              sessionStorage.removeItem("currentPage");
+            }}
           >
             <IoMdLogOut className="size-5 text-teal-600" />
             LOGOUT
-          </NavLink>
+          </button>
         </div>
       </div>
     </nav>

@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import Notes from '../models/note.model';
+import Note from '../models/note.model';
 import {
   deleteImageFromCloudinary,
   uploadImageOnCloudinary,
@@ -11,11 +11,9 @@ export const getNotes = async (req: Request, res: Response) => {
   const perPageCount = 9;
   const skip = (currentPage - 1) * perPageCount;
   try {
-    const notes = await Notes.find()
-      .skip(skip)
-      .limit(perPageCount)
-      .sort('-createdAt');
-    const totalNotes = await Notes.countDocuments();
+    const notes = await Note.find().skip(skip).limit(perPageCount);
+
+    const totalNotes = await Note.countDocuments();
     const totalPages = Math.ceil(totalNotes / perPageCount);
     res.json({ notes, totalNotes, totalPages });
   } catch (error) {
@@ -42,7 +40,7 @@ export const createNote = async (req: Request, res: Response) => {
       req.file.path
     );
 
-    const note = await Notes.create({
+    const note = await Note.create({
       title,
       content,
       public_id,
@@ -64,7 +62,7 @@ export const getSingleNote = async (req: Request, res: Response) => {
       return;
     }
 
-    const note = await Notes.findById(id);
+    const note = await Note.findById(id);
     if (!note) {
       res.status(404).json({ message: 'Note not found' });
       return;
@@ -91,7 +89,7 @@ export const updateNote = async (req: Request, res: Response) => {
       return;
     }
 
-    const note = await Notes.findById(req.params.id);
+    const note = await Note.findById(req.params.id);
     if (!note) {
       res.status(404).json({ message: 'Note not found' });
       return;
@@ -126,14 +124,14 @@ export const deleteNote = async (req: Request, res: Response) => {
       return;
     }
 
-    const note = await Notes.findById(req.params.id);
+    const note = await Note.findById(req.params.id);
     if (!note) {
       res.status(404).json({ message: 'Note not found' });
       return;
     }
 
     await deleteImageFromCloudinary(note.public_id);
-    await Notes.findByIdAndDelete(note._id);
+    await Note.findByIdAndDelete(note._id);
 
     res.json({ message: 'Note deleted' });
   } catch (error) {

@@ -4,9 +4,11 @@ import { CiWarning } from "react-icons/ci";
 import { FaLock, FaUserCircle } from "react-icons/fa";
 import { GoEyeClosed } from "react-icons/go";
 import { MdEmail } from "react-icons/md";
+import { PiSpinnerBold } from "react-icons/pi";
 import { RxEyeOpen } from "react-icons/rx";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PasswordStrength from "../components/PasswordStrength";
+import authRequest from "../ultis/authRequest";
 
 interface FormValues {
   name: string;
@@ -17,6 +19,7 @@ interface FormValues {
 
 const Register = () => {
   const [passwordShow, setPasswordShow] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [confirmPasswordShow, setConfirmPasswordShow] =
     useState<boolean>(false);
   const {
@@ -27,10 +30,23 @@ const Register = () => {
     watch,
     formState: { errors },
   } = useForm<FormValues>();
+  const navigate = useNavigate();
 
-  const onSubmit = (data: FormValues) => {
-    console.log(data);
-    reset();
+  const onSubmit = async (values: FormValues) => {
+    const responseStatus = await authRequest({
+      path: "/auth/register",
+      method: "POST",
+      values: {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+      },
+      setIsLoading,
+    });
+    if (responseStatus?.status === 201) {
+      reset();
+      navigate("/log-in");
+    }
   };
 
   watch();
@@ -132,8 +148,8 @@ const Register = () => {
               {...register("password", {
                 required: "You must specify a password",
                 minLength: {
-                  value: 10,
-                  message: "Password must have at least 10 characters",
+                  value: 8,
+                  message: "Password must have at least 8 characters",
                 },
               })}
             />
@@ -203,8 +219,9 @@ const Register = () => {
 
         <button
           type="submit"
-          className="w-full rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800"
+          className={`flex w-full items-center justify-center gap-2 rounded-lg bg-teal-700 px-5 py-2.5 text-center text-sm font-medium text-white hover:bg-teal-800 focus:outline-none focus:ring-4 focus:ring-teal-300 dark:bg-teal-600 dark:hover:bg-teal-700 dark:focus:ring-teal-800 ${isLoading && "cursor-not-allowed bg-teal-400 hover:bg-teal-500"}`}
         >
+          {isLoading && <PiSpinnerBold size={17} className="animate-spin" />}
           Register
         </button>
       </form>

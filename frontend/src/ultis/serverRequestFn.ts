@@ -12,6 +12,7 @@ interface ServerRequestProps {
     content: string;
     cover_image?: File | string;
   };
+  token?: string;
 }
 
 const serverRequestFn = async ({
@@ -19,6 +20,7 @@ const serverRequestFn = async ({
   path,
   values,
   method,
+  token,
 }: ServerRequestProps) => {
   try {
     setIsLoading(true);
@@ -40,6 +42,7 @@ const serverRequestFn = async ({
       data,
       headers: {
         "Content-Type": values ? "multipart/form-data" : "application/json",
+        Authorization: `Bearer ${token}`,
       },
     });
     toast.success(response.data.message);

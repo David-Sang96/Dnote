@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import { BiSolidArrowToTop } from "react-icons/bi";
+import { FaArrowAltCircleUp } from "react-icons/fa";
 
 const ScrollToTopBtn = () => {
-  const [isVisible, setIsVisible] = useState<boolean>(true);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      //   height: 100px;
-      if (window.scrollY > 110) {
+      //   height: 300px; (window.scrollY value)
+      if (window.scrollY > 300) {
         setIsVisible(true);
       } else {
         setIsVisible(false);
@@ -27,7 +27,7 @@ const ScrollToTopBtn = () => {
 
   return (
     isVisible && (
-      <BiSolidArrowToTop
+      <FaArrowAltCircleUp
         onClick={scrollToTop}
         className="text-orange fixed bottom-16 right-5 z-20 cursor-pointer rounded-full bg-teal-600 text-3xl text-white"
       />

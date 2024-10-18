@@ -8,6 +8,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import useSWR from "swr";
 import DeleteModal from "../components/DeleteModal";
 import SkeletonDetail from "../components/SkeletonDetail";
+import { useAuthContext } from "../contexts/authContext";
 import type { NoteType } from "./Home";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
@@ -20,6 +21,7 @@ const Details = () => {
     fetcher,
   );
   const navigate = useNavigate();
+  const { authUser } = useAuthContext();
 
   if (data && data.message) {
     return (
@@ -70,14 +72,16 @@ const Details = () => {
                 </div>
               </div>
             </div>
-            <div className="mt-4 flex items-center justify-between">
-              <Link to={`/update/${id}`}>
-                <FaEdit className="size-5 text-teal-700" />
-              </Link>
-              <button onClick={() => setShowModal(true)}>
-                <FaTrashCan className="size-5 text-red-700" />
-              </button>
-            </div>
+            {authUser && (
+              <div className="mt-4 flex items-center justify-between">
+                <Link to={`/update/${id}`}>
+                  <FaEdit className="size-5 text-teal-700" />
+                </Link>
+                <button onClick={() => setShowModal(true)}>
+                  <FaTrashCan className="size-5 text-red-700" />
+                </button>
+              </div>
+            )}
           </div>
           {showModal && (
             <DeleteModal setShowModal={setShowModal} _id={data?._id} />

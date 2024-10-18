@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { PiSpinnerBold } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "../contexts/authContext";
 import serverRequestFn from "../ultis/serverRequestFn";
 
 interface DeleteProps {
@@ -10,6 +11,7 @@ interface DeleteProps {
 
 const DeleteModal = ({ setShowModal, _id }: DeleteProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { authUser } = useAuthContext();
   const navigate = useNavigate();
 
   const onDelete = async () => {
@@ -17,6 +19,7 @@ const DeleteModal = ({ setShowModal, _id }: DeleteProps) => {
       setIsLoading,
       path: `/notes/${_id}`,
       method: "DELETE",
+      token: authUser?.token,
     });
 
     if (responseStatus === 200) {
