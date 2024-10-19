@@ -28,7 +28,7 @@ const isAuth = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch (error: any) {
     if (error.name === 'TokenExpiredError') {
-      res.status(401).json({ message: 'Unauthorized - token expired' });
+      res.status(440).json({ message: 'Unauthorized - token expired' });
       return;
     } else if (error.name === 'JsonWebTokenError') {
       res.status(401).json({ message: 'Unauthorized - invalid token' });

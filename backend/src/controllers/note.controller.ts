@@ -7,11 +7,22 @@ import {
 } from '../ultis/UploadOnCloud';
 
 export const getNotes = async (req: Request, res: Response) => {
+  const searchQuery = req.query.search || '';
   const currentPage = Number(req.query.page) || 1;
   const perPageCount = 9;
   const skip = (currentPage - 1) * perPageCount;
+
+  const filter = searchQuery
+    ? {
+        $or: [
+          { title: { $regex: searchQuery, $options: 'i' } },
+          { content: { $regex: searchQuery, $options: 'i' } },
+        ],
+      }
+    : {};
+
   try {
-    const notes = await Note.find().skip(skip).limit(perPageCount);
+    const notes = await Note.find(filter).skip(skip).limit(perPageCount);
 
     const totalNotes = await Note.countDocuments();
     const totalPages = Math.ceil(totalNotes / perPageCount);
@@ -84,6 +95,36 @@ export const getSingleNote = async (req: Request, res: Response) => {
     const note = await Note.findById(id);
     if (!note) {
       res.status(404).json({ message: 'Note not found' });
+      return;
+    }
+
+    res.json(note);
+  } catch (error) {
+    console.error('Error in getSingleNote controller: ', error);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+export const getMySingleNote = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+    if (!mongoose.isValidObjectId(id)) {
+      res.status(400).json({ message: 'Invalid Id' });
+      return;
+    }
+
+    const note = await Note.findById(id);
+    if (!note) {
+      res.status(404).json({ message: 'Note not found' });
+      return;
+    }
+
+    const isCurrentUser = note.author.toString() === req.userId;
+
+    if (!isCurrentUser) {
+      res
+        .status(403)
+        .json({ message: 'Not allowed to performance the action' });
       return;
     }
 

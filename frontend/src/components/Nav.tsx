@@ -55,19 +55,19 @@ const Nav = () => {
         )}
       </ul>
 
-      {authUser && (
-        <div className="flex items-center gap-5 sm:hidden">
+      <div className="flex items-center gap-5 sm:hidden">
+        {authUser && (
           <Link to={"/create"}>
             <IoIosAddCircle className="size-7 text-teal-600" />
           </Link>
-          <div
-            className="text-3xl text-teal-600 sm:hidden"
-            onClick={() => setShowMenu((prev) => !prev)}
-          >
-            <RxHamburgerMenu />
-          </div>
+        )}
+        <div
+          className="text-3xl text-teal-600 sm:hidden"
+          onClick={() => setShowMenu((prev) => !prev)}
+        >
+          <RxHamburgerMenu />
         </div>
-      )}
+      </div>
 
       {/* Sidebar menu for mobile device */}
       <div

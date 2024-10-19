@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import useSWR from "swr";
 import NoteCard from "../components/NoteCard";
 import ScrollToTopBtn from "../components/ScrollToTopBtn";
@@ -31,7 +31,7 @@ const fetcher = (url: string) => {
   }).then((res) => {
     if (!res.ok) {
       return res.json().then((errorData) => {
-        throw new Error(errorData.message || "Unauthorized - token expired");
+        throw new Error(errorData.message);
       });
     }
     return res.json();
@@ -42,6 +42,7 @@ const MyNotes = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
   const [token, setToken] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   const { data, isLoading, error } = useSWR<NotesResponse>(
     token && `${import.meta.env.VITE_API_URL}/my-note?page=${page}`,
@@ -82,7 +83,11 @@ const MyNotes = () => {
   }, [data]);
 
   if (error) {
-    // If the error object has a message, display it; otherwise, show a fallback message
+    if (error.message === "Unauthorized - token expired") {
+      localStorage.removeItem("authUser");
+      navigate("/log-in");
+    }
+
     return (
       <p className="text-center text-xl font-medium text-red-500">
         {error.message

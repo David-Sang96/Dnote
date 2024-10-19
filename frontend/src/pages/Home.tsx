@@ -1,10 +1,14 @@
-import { useEffect, useState } from "react";
+import { debounce } from "lodash";
+import { useEffect, useRef, useState } from "react";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { Link } from "react-router-dom";
 import useSWR from "swr";
 import NoteCard from "../components/NoteCard";
 import ScrollToTopBtn from "../components/ScrollToTopBtn";
+import SearchInput from "../components/SearchInput";
 import SkeletonNoteCard from "../components/SkeletonNoteCard";
+import { useAuthContext } from "../contexts/authContext";
+
 export interface NoteType {
   _id: string;
   author: string;
@@ -15,6 +19,7 @@ export interface NoteType {
   message: string;
   pathVar?: string;
 }
+
 export interface NotesResponse {
   notes: NoteType[];
   totalNotes: number;
@@ -26,11 +31,16 @@ const fetcher = (url: string) => fetch(url).then((res) => res.json());
 const Home = () => {
   const [page, setPage] = useState<number>(1);
   const [totalPage, setTotalPage] = useState<number>(0);
+  const [search, setSearch] = useState<string>("");
+  const searchRef = useRef<HTMLInputElement>(null);
+  const { authUser } = useAuthContext();
 
   const { data, isLoading, error } = useSWR<NotesResponse>(
-    `${import.meta.env.VITE_API_URL}/notes/all?page=${page}`,
+    `${import.meta.env.VITE_API_URL}/notes/all?page=${page}&search=${search}`,
     fetcher,
   );
+
+  const handleSearch = debounce((e) => setSearch(e.target.value), 500);
 
   useEffect(() => {
     const savedPage = sessionStorage.getItem("currentPage");
@@ -55,12 +65,16 @@ const Home = () => {
     }
   };
 
+  const handleClearSearch = () => {
+    setSearch("");
+    if (searchRef.current) searchRef.current.value = "";
+  };
+
   useEffect(() => {
     if (data) setTotalPage(data?.totalPages);
   }, [data]);
 
   if (error) {
-    // If the error object has a message, display it; otherwise, show a fallback message
     return (
       <p className="text-center text-xl font-medium text-red-500">
         {error.message
@@ -70,27 +84,41 @@ const Home = () => {
     );
   }
 
-  if (data?.notes.length === 0)
-    return (
-      <div className="pt-20 text-center text-xl font-medium">
-        <p>No notes available.</p>
-        <Link to="/create" className="text-sm font-normal underline">
-          Create one
-        </Link>
-      </div>
-    );
+  const noNotesFound = data?.notes.length === 0 && search;
 
   return (
     <section className="pb-4">
-      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
-        {isLoading ? (
-          <SkeletonNoteCard />
-        ) : (
-          data?.notes.map((note) => (
+      {authUser && (
+        <SearchInput
+          search={search}
+          handleClearSearch={handleClearSearch}
+          searchRef={searchRef}
+          handleSearch={handleSearch}
+        />
+      )}
+
+      {isLoading ? (
+        <SkeletonNoteCard />
+      ) : noNotesFound ? (
+        <div className="pt-20 text-center text-xl font-medium">
+          <p>No notes found for "{search}".</p>
+        </div>
+      ) : data?.notes.length === 0 ? (
+        <div className="pt-20 text-center text-xl font-medium">
+          <p>No notes available.</p>
+          {authUser && (
+            <Link to="/create" className="text-sm font-normal underline">
+              Create one
+            </Link>
+          )}
+        </div>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+          {data?.notes.map((note) => (
             <NoteCard key={note._id} {...note} pathVar="note" />
-          ))
-        )}
-      </div>
+          ))}
+        </div>
+      )}
 
       {!isLoading && data && data.totalNotes > 9 && (
         <nav
@@ -112,7 +140,7 @@ const Home = () => {
                 <li key={i + 1}>
                   <button
                     className={`flex h-8 items-center justify-center border border-gray-300 bg-white px-3 leading-tight text-gray-500 hover:bg-stone-200 hover:text-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white`}
-                    style={{ backgroundColor: page === i + 1 ? "#e7e5e4" : "" }} // Fallback to inline style
+                    style={{ backgroundColor: page === i + 1 ? "#e7e5e4" : "" }}
                     onClick={() => handlePage(i + 1)}
                   >
                     {i + 1}

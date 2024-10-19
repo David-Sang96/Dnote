@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEdit, FaRegUser } from "react-icons/fa";
 import { FaTrashCan } from "react-icons/fa6";
 import { IoReturnUpBackOutline } from "react-icons/io5";
@@ -11,17 +11,38 @@ import SkeletonDetail from "../components/SkeletonDetail";
 import { useAuthContext } from "../contexts/authContext";
 import type { NoteType } from "./Home";
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+const fetcher = (url: string) => {
+  const authUser = localStorage.getItem("authUser");
+  const token = authUser ? JSON.parse(authUser).token : null;
+
+  return fetch(url, { headers: { Authorization: `Bearer ${token}` } }).then(
+    (res) => {
+      if (!res.ok) {
+        return res.json().then((error) => {
+          throw new Error(error.message);
+        });
+      }
+      return res.json();
+    },
+  );
+};
 
 const MyNoteDetails = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [token, setToken] = useState<string | null>(null);
   const { id } = useParams();
-  const { data, isLoading } = useSWR<NoteType>(
-    `${import.meta.env.VITE_API_URL}/notes/${id}`,
+  const { data, isLoading, error } = useSWR<NoteType>(
+    token && `${import.meta.env.VITE_API_URL}/my-note/${id}`,
     fetcher,
   );
   const navigate = useNavigate();
   const { authUser } = useAuthContext();
+
+  useEffect(() => {
+    const authUser = localStorage.getItem("authUser");
+    const fetchedToken = authUser ? JSON.parse(authUser).token : null;
+    setToken(fetchedToken);
+  }, []);
 
   if (data && data.message) {
     return (
@@ -31,6 +52,21 @@ const MyNoteDetails = () => {
           Back to home
         </Link>
       </div>
+    );
+  }
+
+  if (error) {
+    if (error.message === "Unauthorized - token expired") {
+      localStorage.removeItem("authUser");
+      navigate("/log-in");
+    }
+
+    return (
+      <p className="text-center text-xl font-medium text-red-500">
+        {error.message
+          ? `Error: ${error.message}`
+          : "An error occurred while fetching data."}
+      </p>
     );
   }
 
