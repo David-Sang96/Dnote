@@ -13,6 +13,7 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import MyNoteDetails from "../pages/MyNoteDetails";
 import MyNotes from "../pages/MyNotes";
+import NotFound from "../pages/NotFound";
 import Register from "../pages/Register";
 import Update from "../pages/Update";
 
@@ -55,6 +56,10 @@ const Routes = () => {
           ) : (
             <Navigate to="/log-in" replace />
           ),
+        },
+        {
+          path: "*",
+          element: <NotFound />,
         },
       ],
     },
